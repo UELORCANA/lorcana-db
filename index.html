@@ -1,257 +1,248 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lorcana カードDB</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCG カードDB（非公式）</title>
 
-<style>
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #f4f4f4;
-}
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 12px;
+      background: #f5f5f5;
+    }
 
-h1 {
-  margin: 0;
-  padding: 12px;
-  background: #222;
-  color: #fff;
-  font-size: 18px;
-  text-align: center;
-}
+    h1 {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
 
-/* 検索UI */
-.search-box {
-  background: #fff;
-  padding: 10px;
-  display: grid;
-  gap: 8px;
-}
+    .disclaimer {
+      font-size: 0.75rem;
+      color: #555;
+      background: #fff;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
 
-.search-box label {
-  font-size: 13px;
-}
+    .search-box {
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
 
-.search-box input,
-.search-box select {
-  width: 100%;
-  padding: 6px;
-  font-size: 14px;
-}
+    .search-box label {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
 
-/* カード一覧 */
-.card-list {
-  padding: 12px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 12px;
-}
+    .search-box input,
+    .search-box select {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+      font-size: 1rem;
+    }
 
-.card {
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  cursor: pointer;
-}
+    .range {
+      display: flex;
+      gap: 6px;
+    }
 
-.card img {
-  width: 100%;
-  display: block;
-}
+    button {
+      margin-top: 12px;
+      width: 100%;
+      padding: 8px;
+      font-size: 1rem;
+    }
 
-/* モーダル */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-}
+    .card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
 
-.modal-content {
-  background: #fff;
-  width: 90%;
-  max-width: 420px;
-  border-radius: 10px;
-  padding: 12px;
-}
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+      cursor: pointer;
+    }
 
-.modal-content img {
-  width: 100%;
-  border-radius: 6px;
-}
+    .card img {
+      width: 100%;
+      border-radius: 4px;
+    }
 
-.close {
-  text-align: right;
-  cursor: pointer;
-  font-size: 14px;
-}
-</style>
+    .card-name {
+      margin-top: 6px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    /* モーダル */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 12px;
+      max-width: 90%;
+      border-radius: 8px;
+    }
+
+    .modal img {
+      width: 100%;
+    }
+
+    .close {
+      text-align: right;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>Lorcana カードDB</h1>
+<h1>TCG カードDB（非公式）</h1>
 
-<!-- 検索UI -->
+<div class="disclaimer">
+  本サイトはファンが非公式に作成したカードデータベースです。<br>
+  Disney Lorcana および関連する名称・画像・商標の権利は、<br>
+  それぞれの権利所有者に帰属します。本サイトはそれらの権利を侵害する意図はありません。
+</div>
+
 <div class="search-box">
   <label>フリーワード</label>
-  <input type="text" id="keyword">
+  <input type="text" id="keyword" placeholder="カード名・効果">
 
-  <label>コスト（以下）</label>
-  <select id="cost">
-    <option value="">指定なし</option>
-    <script>
-      for(let i=1;i<=10;i++){
-        document.write(`<option value="${i}">${i}</option>`);
-      }
-    </script>
-  </select>
+  <label>コスト（1〜10）</label>
+  <div class="range">
+    <input type="number" id="costMin" placeholder="最小">
+    <input type="number" id="costMax" placeholder="最大">
+  </div>
 
-  <label>攻撃力（以上）</label>
-  <select id="atk">
-    <option value="">指定なし</option>
-    <script>
-      for(let i=0;i<=12;i++){
-        document.write(`<option value="${i}">${i}</option>`);
-      }
-    </script>
-  </select>
+  <label>攻撃力（範囲）</label>
+  <div class="range">
+    <select id="atkMin"></select>
+    <select id="atkMax"></select>
+  </div>
 
-  <label>意思力（以上）</label>
-  <select id="will">
-    <option value="">指定なし</option>
-    <script>
-      for(let i=0;i<=12;i++){
-        document.write(`<option value="${i}">${i}</option>`);
-      }
-    </script>
-  </select>
+  <label>意思力（範囲）</label>
+  <div class="range">
+    <select id="willMin"></select>
+    <select id="willMax"></select>
+  </div>
 
-  <label>色</label>
-  <select id="color">
-    <option value="">指定なし</option>
-    <option value="アンバー">アンバー</option>
-  </select>
-
-  <label>レアリティ</label>
-  <select id="rarity">
-    <option value="">指定なし</option>
-    <option value="レア">レア</option>
-  </select>
-
-  <label>セット</label>
-  <select id="set">
-    <option value="">指定なし</option>
-    <option value="8">8</option>
-  </select>
-
-  <label>種族</label>
-  <select id="tribe">
-    <option value="">指定なし</option>
-    <option value="ストーリーボーン">ストーリーボーン</option>
-    <option value="ヒーロー">ヒーロー</option>
-  </select>
+  <button onclick="search()">検索</button>
 </div>
 
 <div class="card-list" id="cardList"></div>
 
 <!-- モーダル -->
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <div class="close" onclick="closeModal()">× 閉じる</div>
-    <img id="modalImage">
-    <p><strong id="modalName"></strong></p>
-    <p id="modalStats"></p>
-    <p id="modalEffect"></p>
+<div class="modal" id="modal" onclick="closeModal()">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="close" onclick="closeModal()">×</div>
+    <img id="modalImg">
+    <p id="modalText"></p>
   </div>
 </div>
 
 <script>
-const cards = [
-  {
-    name: "LADY Family Dog",
-    cost: 3,
-    atk: 2,
-    will: 2,
-    lore: 2,
-    tribes: ["ストーリーボーン", "ヒーロー"],
-    set: "8",
-    rarity: "レア",
-    color: "アンバー",
-    effect: "このキャラクターをプレイしたとき、コスト2以下のキャラクターを1体コストを支払わずにプレイしてもよい。",
-    image: "images/lady_familydog.webp"
+  const cards = [
+    {
+      name: "LADY Family Dog",
+      image: "lady_familydog.webp",
+      cost: 3,
+      atk: 2,
+      will: 2,
+      lore: 2,
+      color: "アンバー",
+      race: ["ストーリーボーン", "ヒーロー"],
+      rarity: "レア",
+      set: 8,
+      text: "このキャラクターをプレイしたとき、コスト2以下のキャラクターを1体コストを支払わずにプレイしてもよい。"
+    }
+  ];
+
+  function fillSelect(id, max) {
+    const sel = document.getElementById(id);
+    sel.innerHTML = `<option value="">指定なし</option>`;
+    for (let i = 0; i <= max; i++) {
+      sel.innerHTML += `<option value="${i}">${i}</option>`;
+    }
   }
-];
 
-const cardList = document.getElementById("cardList");
+  fillSelect("atkMin", 12);
+  fillSelect("atkMax", 12);
+  fillSelect("willMin", 12);
+  fillSelect("willMax", 12);
 
-function renderCards() {
-  cardList.innerHTML = "";
+  function render(list) {
+    const area = document.getElementById("cardList");
+    area.innerHTML = "";
 
-  const keyword = keywordInput.value;
-  const cost = costSelect.value;
-  const atk = atkSelect.value;
-  const will = willSelect.value;
-  const color = colorSelect.value;
-  const rarity = raritySelect.value;
-  const set = setSelect.value;
-  const tribe = tribeSelect.value;
+    list.forEach(card => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <img src="${card.image}">
+        <div class="card-name">${card.name}</div>
+      `;
+      div.onclick = () => openModal(card);
+      area.appendChild(div);
+    });
+  }
 
-  cards.filter(card => {
-    if (cost && card.cost > cost) return false;
-    if (atk && card.atk < atk) return false;
-    if (will && card.will < will) return false;
-    if (color && card.color !== color) return false;
-    if (rarity && card.rarity !== rarity) return false;
-    if (set && card.set !== set) return false;
-    if (tribe && !card.tribes.includes(tribe)) return false;
-    if (keyword &&
-      !card.name.includes(keyword) &&
-      !card.effect.includes(keyword)
-    ) return false;
-    return true;
-  }).forEach(card => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `<img src="lady_familydog.webp">`;
-    div.onclick = () => openModal(card);
-    cardList.appendChild(div);
-  });
-}
+  function search() {
+    const kw = document.getElementById("keyword").value.toLowerCase();
+    const costMin = Number(document.getElementById("costMin").value);
+    const costMax = Number(document.getElementById("costMax").value);
+    const atkMin = Number(document.getElementById("atkMin").value);
+    const atkMax = Number(document.getElementById("atkMax").value);
+    const willMin = Number(document.getElementById("willMin").value);
+    const willMax = Number(document.getElementById("willMax").value);
 
-function openModal(card) {
-  modal.style.display = "flex";
-  modalImage.src = card.image;
-  modalName.textContent = card.name;
-  modalStats.textContent =
-    `コスト:${card.cost} 攻撃:${card.atk} 意思:${card.will} ロア:${card.lore}`;
-  modalEffect.textContent = card.effect;
-}
+    const result = cards.filter(c => {
+      if (kw && !(`${c.name}${c.text}`.toLowerCase().includes(kw))) return false;
+      if (!isNaN(costMin) && c.cost < costMin) return false;
+      if (!isNaN(costMax) && c.cost > costMax) return false;
+      if (!isNaN(atkMin) && c.atk < atkMin) return false;
+      if (!isNaN(atkMax) && c.atk > atkMax) return false;
+      if (!isNaN(willMin) && c.will < willMin) return false;
+      if (!isNaN(willMax) && c.will > willMax) return false;
+      return true;
+    });
 
-function closeModal() {
-  modal.style.display = "none";
-}
+    render(result);
+  }
 
-const keywordInput = document.getElementById("keyword");
-const costSelect = document.getElementById("cost");
-const atkSelect = document.getElementById("atk");
-const willSelect = document.getElementById("will");
-const colorSelect = document.getElementById("color");
-const raritySelect = document.getElementById("rarity");
-const setSelect = document.getElementById("set");
-const tribeSelect = document.getElementById("tribe");
+  function openModal(card) {
+    document.getElementById("modalImg").src = card.image;
+    document.getElementById("modalText").textContent = card.text;
+    document.getElementById("modal").style.display = "flex";
+  }
 
-document.querySelectorAll(".search-box input, .search-box select")
-  .forEach(el => el.addEventListener("input", renderCards));
+  function closeModal() {
+    document.getElementById("modal").style.display = "none";
+  }
 
-renderCards();
+  render(cards);
 </script>
 
 </body>
 </html>
-
