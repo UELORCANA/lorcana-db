@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lorcana カードDB</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #f4f4f4;
+}
+
+h1 {
+  margin: 0;
+  padding: 12px;
+  background: #222;
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+}
+
+/* 検索UI */
+.search-box {
+  background: #fff;
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.search-box label {
+  font-size: 13px;
+}
+
+.search-box input,
+.search-box select {
+  width: 100%;
+  padding: 6px;
+  font-size: 14px;
+}
+
+/* カード一覧 */
+.card-list {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+}
+
+.card img {
+  width: 100%;
+  display: block;
+}
+
+/* モーダル */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 420px;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.modal-content img {
+  width: 100%;
+  border-radius: 6px;
+}
+
+.close {
+  text-align: right;
+  cursor: pointer;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Lorcana カードDB</h1>
+
+<!-- 検索UI -->
+<div class="search-box">
+  <label>フリーワード</label>
+  <input type="text" id="keyword">
+
+  <label>コスト（以下）</label>
+  <select id="cost">
+    <option value="">指定なし</option>
+    <script>
+      for(let i=1;i<=10;i++){
+        document.write(`<option value="${i}">${i}</option>`);
+      }
+    </script>
+  </select>
+
+  <label>攻撃力（以上）</label>
+  <select id="atk">
+    <option value="">指定なし</option>
+    <script>
+      for(let i=0;i<=12;i++){
+        document.write(`<option value="${i}">${i}</option>`);
+      }
+    </script>
+  </select>
+
+  <label>意思力（以上）</label>
+  <select id="will">
+    <option value="">指定なし</option>
+    <script>
+      for(let i=0;i<=12;i++){
+        document.write(`<option value="${i}">${i}</option>`);
+      }
+    </script>
+  </select>
+
+  <label>色</label>
+  <select id="color">
+    <option value="">指定なし</option>
+    <option value="アンバー">アンバー</option>
+  </select>
+
+  <label>レアリティ</label>
+  <select id="rarity">
+    <option value="">指定なし</option>
+    <option value="レア">レア</option>
+  </select>
+
+  <label>セット</label>
+  <select id="set">
+    <option value="">指定なし</option>
+    <option value="8">8</option>
+  </select>
+
+  <label>種族</label>
+  <select id="tribe">
+    <option value="">指定なし</option>
+    <option value="ストーリーボーン">ストーリーボーン</option>
+    <option value="ヒーロー">ヒーロー</option>
+  </select>
+</div>
+
+<div class="card-list" id="cardList"></div>
+
+<!-- モーダル -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <div class="close" onclick="closeModal()">× 閉じる</div>
+    <img id="modalImage">
+    <p><strong id="modalName"></strong></p>
+    <p id="modalStats"></p>
+    <p id="modalEffect"></p>
+  </div>
+</div>
+
+<script>
+const cards = [
+  {
+    name: "LADY Family Dog",
+    cost: 3,
+    atk: 2,
+    will: 2,
+    lore: 2,
+    tribes: ["ストーリーボーン", "ヒーロー"],
+    set: "8",
+    rarity: "レア",
+    color: "アンバー",
+    effect: "このキャラクターをプレイしたとき、コスト2以下のキャラクターを1体コストを支払わずにプレイしてもよい。",
+    image: "images/lady_familydog.webp"
+  }
+];
+
+const cardList = document.getElementById("cardList");
+
+function renderCards() {
+  cardList.innerHTML = "";
+
+  const keyword = keywordInput.value;
+  const cost = costSelect.value;
+  const atk = atkSelect.value;
+  const will = willSelect.value;
+  const color = colorSelect.value;
+  const rarity = raritySelect.value;
+  const set = setSelect.value;
+  const tribe = tribeSelect.value;
+
+  cards.filter(card => {
+    if (cost && card.cost > cost) return false;
+    if (atk && card.atk < atk) return false;
+    if (will && card.will < will) return false;
+    if (color && card.color !== color) return false;
+    if (rarity && card.rarity !== rarity) return false;
+    if (set && card.set !== set) return false;
+    if (tribe && !card.tribes.includes(tribe)) return false;
+    if (keyword &&
+      !card.name.includes(keyword) &&
+      !card.effect.includes(keyword)
+    ) return false;
+    return true;
+  }).forEach(card => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `<img src="${card.image}" alt="${card.name}">`;
+    div.onclick = () => openModal(card);
+    cardList.appendChild(div);
+  });
+}
+
+function openModal(card) {
+  modal.style.display = "flex";
+  modalImage.src = card.image;
+  modalName.textContent = card.name;
+  modalStats.textContent =
+    `コスト:${card.cost} 攻撃:${card.atk} 意思:${card.will} ロア:${card.lore}`;
+  modalEffect.textContent = card.effect;
+}
+
+function closeModal() {
+  modal.style.display = "none";
+}
+
+const keywordInput = document.getElementById("keyword");
+const costSelect = document.getElementById("cost");
+const atkSelect = document.getElementById("atk");
+const willSelect = document.getElementById("will");
+const colorSelect = document.getElementById("color");
+const raritySelect = document.getElementById("rarity");
+const setSelect = document.getElementById("set");
+const tribeSelect = document.getElementById("tribe");
+
+document.querySelectorAll(".search-box input, .search-box select")
+  .forEach(el => el.addEventListener("input", renderCards));
+
+renderCards();
+</script>
+
+</body>
+</html>
