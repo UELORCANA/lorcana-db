@@ -6,16 +6,19 @@
 <title>TCG カードDB（非公式）</title>
 
 <style>
-body {
+body{
   font-family: system-ui, sans-serif;
   background:#f5f5f5;
   margin:0;
   padding:12px;
 }
 
-h1 { text-align:center; font-size:1.4rem; }
+h1{
+  text-align:center;
+  font-size:1.4rem;
+}
 
-.disclaimer {
+.disclaimer{
   font-size:0.75rem;
   background:#fff;
   padding:8px;
@@ -23,49 +26,64 @@ h1 { text-align:center; font-size:1.4rem; }
   margin-bottom:12px;
 }
 
-.search-box {
+.search-box{
   background:#fff;
   padding:12px;
   border-radius:8px;
   margin-bottom:16px;
 }
 
-label { font-size:0.85rem; display:block; margin-top:8px; }
-
-input, select {
-  width:100%;
-  padding:6px;
-  margin-top:4px;
+.filter-group{
+  margin-bottom:12px;
 }
 
-.range { display:flex; gap:6px; }
+.filter-group h3{
+  font-size:0.9rem;
+  margin:0 0 6px;
+}
 
-.card-list {
+.checkbox-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  gap:4px;
+}
+
+label{
+  font-size:0.8rem;
+}
+
+button{
+  width:100%;
+  padding:8px;
+  font-size:0.9rem;
+}
+
+.card-list{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
   gap:12px;
 }
 
-.card {
+.card{
   background:#fff;
   padding:8px;
   border-radius:8px;
   cursor:pointer;
 }
 
-.card-image {
+.card-image{
   width:100%;
   aspect-ratio:63/88;
   background:#000;
 }
 
-.card-image img {
+.card-image img{
   width:100%;
   height:100%;
   object-fit:contain;
 }
 
-.card-name {
+.card-name{
   text-align:center;
   font-size:0.9rem;
   font-weight:bold;
@@ -73,7 +91,7 @@ input, select {
 }
 
 /* モーダル */
-.modal {
+.modal{
   display:none;
   position:fixed;
   inset:0;
@@ -81,14 +99,17 @@ input, select {
   justify-content:center;
   align-items:center;
 }
-.modal-content {
+.modal-content{
   background:#fff;
   padding:12px;
   max-width:90%;
   border-radius:8px;
 }
-.modal-content img { width:100%; }
-.close { text-align:right; cursor:pointer; }
+.modal-content img{ width:100%; }
+.close{
+  text-align:right;
+  cursor:pointer;
+}
 </style>
 </head>
 
@@ -102,54 +123,54 @@ Disney Lorcana に関する権利は各権利者に帰属します。
 </div>
 
 <div class="search-box">
-  <label>フリーワード</label>
-  <input id="kw">
 
-  <label>コスト</label>
-  <div class="range">
-    <input id="costMin" type="number" placeholder="最小">
-    <input id="costMax" type="number" placeholder="最大">
+  <!-- カラー -->
+  <div class="filter-group">
+    <h3>カラー</h3>
+    <div class="checkbox-grid">
+      <label><input type="checkbox" class="color" value="アメジスト"> アメジスト</label>
+      <label><input type="checkbox" class="color" value="アンバー"> アンバー</label>
+      <label><input type="checkbox" class="color" value="エメラルド"> エメラルド</label>
+      <label><input type="checkbox" class="color" value="サファイア"> サファイア</label>
+      <label><input type="checkbox" class="color" value="スティール"> スティール</label>
+      <label><input type="checkbox" class="color" value="ルビー"> ルビー</label>
+    </div>
   </div>
 
-  <label>攻撃力</label>
-  <div class="range">
-    <select id="atkMin"></select>
-    <select id="atkMax"></select>
+  <!-- レアリティ -->
+  <div class="filter-group">
+    <h3>レアリティ</h3>
+    <div class="checkbox-grid">
+      <label><input type="checkbox" class="rarity" value="コモン"> コモン</label>
+      <label><input type="checkbox" class="rarity" value="アンコモン"> アンコモン</label>
+      <label><input type="checkbox" class="rarity" value="レア"> レア</label>
+      <label><input type="checkbox" class="rarity" value="スーパーレア"> スーパーレア</label>
+      <label><input type="checkbox" class="rarity" value="レジェンダリー"> レジェンダリー</label>
+      <label><input type="checkbox" class="rarity" value="エピック"> エピック</label>
+      <label><input type="checkbox" class="rarity" value="エンチャンテッド"> エンチャンテッド</label>
+      <label><input type="checkbox" class="rarity" value="アイコニック"> アイコニック</label>
+      <label><input type="checkbox" class="rarity" value="その他"> その他</label>
+    </div>
   </div>
 
-  <label>意思力</label>
-  <div class="range">
-    <select id="willMin"></select>
-    <select id="willMax"></select>
+  <!-- コスト -->
+  <div class="filter-group">
+    <h3>コスト</h3>
+    <div class="checkbox-grid" id="costGroup"></div>
   </div>
 
-  <label>ロア</label>
-  <select id="lore"></select>
-
-  <label>色</label>
-  <select id="color">
-    <option value="">指定なし</option>
-    <option>アンバー</option>
-  </select>
-
-  <label>レアリティ</label>
-  <select id="rarity">
-    <option value="">指定なし</option>
-    <option>レア</option>
-  </select>
-
-  <label>セット</label>
-  <select id="set"></select>
-
-  <label>種族</label>
-  <label><input type="checkbox" value="ストーリーボーン" class="race"> ストーリーボーン</label>
-  <label><input type="checkbox" value="ヒーロー" class="race"> ヒーロー</label>
+  <!-- 収録弾 -->
+  <div class="filter-group">
+    <h3>収録弾</h3>
+    <div class="checkbox-grid" id="setGroup"></div>
+  </div>
 
   <button onclick="search()">検索</button>
 </div>
 
 <div class="card-list" id="list"></div>
 
+<!-- モーダル -->
 <div class="modal" id="modal" onclick="closeModal()">
   <div class="modal-content" onclick="event.stopPropagation()">
     <div class="close" onclick="closeModal()">×</div>
@@ -159,76 +180,46 @@ Disney Lorcana に関する権利は各権利者に帰属します。
 </div>
 
 <script>
-const cards=[{
-  name:"LADY Family Dog",
-  image:"lady_familydog.webp",
-  cost:3, atk:2, will:2, lore:2,
-  color:"アンバー", rarity:"レア", set:8,
-  race:["ストーリーボーン","ヒーロー"],
-  text:"このキャラクターをプレイしたとき、コスト2以下のキャラクターを1体コストを支払わずにプレイしてもよい。"
-}];
+const cards = [
+  {
+    name:"LADY Family Dog",
+    image:"lady_familydog.webp",
+    cost:3,
+    color:"アンバー",
+    rarity:"レア",
+    set:8,
+    text:"このキャラクターをプレイしたとき、コスト2以下のキャラクターを1体コストを支払わずにプレイしてもよい。"
+  }
+];
 
-function fill(id,max){
-  const s=document.getElementById(id);
-  s.innerHTML='<option value="">指定なし</option>';
-  for(let i=0;i<=max;i++) s.innerHTML+=`<option>${i}</option>`;
+// チェックボックス生成
+function createCheckboxes(id, cls, from, to){
+  const el = document.getElementById(id);
+  for(let i=from;i<=to;i++){
+    const label = document.createElement("label");
+    label.innerHTML = `<input type="checkbox" class="${cls}" value="${i}"> ${i}`;
+    el.appendChild(label);
+  }
 }
-fill("atkMin",12); fill("atkMax",12);
-fill("willMin",12); fill("willMax",12);
-fill("lore",5); fill("set",8);
+createCheckboxes("costGroup","cost",1,12);
+createCheckboxes("setGroup","set",1,11);
+
+function getCheckedValues(cls){
+  return [...document.querySelectorAll(`.${cls}:checked`)]
+          .map(el => el.value);
+}
 
 function search(){
-  const kw = document.getElementById("kw").value.toLowerCase();
-
-  const costMin = Number(document.getElementById("costMin")?.value);
-  const costMax = Number(document.getElementById("costMax")?.value);
-
-  const atkMin = Number(document.getElementById("atkMin").value);
-  const atkMax = Number(document.getElementById("atkMax").value);
-
-  const willMin = Number(document.getElementById("willMin").value);
-  const willMax = Number(document.getElementById("willMax").value);
-
-  const lore = document.getElementById("lore").value;
-  const color = document.getElementById("color").value;
-  const rarity = document.getElementById("rarity").value;
-  const set = document.getElementById("set").value;
-
-  const races = [...document.querySelectorAll(".race:checked")]
-                  .map(r => r.value);
+  const colors = getCheckedValues("color");
+  const rarities = getCheckedValues("rarity");
+  const costs = getCheckedValues("cost").map(Number);
+  const sets = getCheckedValues("set").map(Number);
 
   const result = cards.filter(c => {
-
-    // フリーワード
-    if (kw && !(`${c.name}${c.text}`.toLowerCase().includes(kw))) return false;
-
-    // コスト
-    if (!isNaN(costMin) && c.cost < costMin) return false;
-    if (!isNaN(costMax) && c.cost > costMax) return false;
-
-    // 攻撃力
-    if (!isNaN(atkMin) && c.atk < atkMin) return false;
-    if (!isNaN(atkMax) && c.atk > atkMax) return false;
-
-    // 意思力
-    if (!isNaN(willMin) && c.will < willMin) return false;
-    if (!isNaN(willMax) && c.will > willMax) return false;
-
-    // ロア
-    if (lore && c.lore != lore) return false;
-
-    // 色
-    if (color && c.color !== color) return false;
-
-    // レアリティ
-    if (rarity && c.rarity !== rarity) return false;
-
-    // セット
-    if (set && c.set != set) return false;
-
-    // 種族（複数指定OK）
-    if (races.length && !races.some(r => c.race.includes(r))) return false;
-
+    if (colors.length && !colors.includes(c.color)) return false;
+    if (rarities.length && !rarities.includes(c.rarity)) return false;
+    if (costs.length && !costs.includes(c.cost)) return false;
+    if (sets.length && !sets.includes(c.set)) return false;
     return true;
   });
 
@@ -236,29 +227,41 @@ function search(){
 }
 
 function render(list){
-  const el=document.getElementById("list");
-  el.innerHTML="";
-  list.forEach(c=>{
-    const d=document.createElement("div");
-    d.className="card";
-    d.innerHTML=`
+  const el = document.getElementById("list");
+  el.innerHTML = "";
+
+  if(list.length === 0){
+    el.innerHTML = "<p>該当するカードがありません</p>";
+    return;
+  }
+
+  list.forEach(c => {
+    const d = document.createElement("div");
+    d.className = "card";
+    d.innerHTML = `
       <div class="card-image"><img src="${c.image}"></div>
-      <div class="card-name">${c.name}</div>`;
-    d.onclick=()=>openModal(c);
+      <div class="card-name">${c.name}</div>
+    `;
+    d.onclick = () => openModal(c);
     el.appendChild(d);
   });
 }
 
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modalImg");
+const modalText = document.getElementById("modalText");
+
 function openModal(c){
-  modal.style.display="flex";
-  modalImg.src=c.image;
-  modalText.textContent=c.text;
+  modal.style.display = "flex";
+  modalImg.src = c.image;
+  modalText.textContent = c.text;
 }
-function closeModal(){ modal.style.display="none"; }
+function closeModal(){
+  modal.style.display = "none";
+}
 
 render(cards);
 </script>
 
 </body>
 </html>
-
