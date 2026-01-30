@@ -1,266 +1,47 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quest For</title>
+GitHubでコードを書いて、TCGのデータベースサイト（検索機能付き）を作る。コードを書いてほしい。
 
-<style>
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background-color: #f5f1e8;
-  color: #1b2a4a;
-}
+要件を言うね。
 
-header {
-  text-align: center;
-  padding: 20px;
-}
+サイト名：Quest For
+サイト名のすぐ下に説明文：本サイトはディズニーロルカナの非公式ファンサイトです。本サイトに関する全ての権利は各権利者に帰属します。本サイトは各権利者のあらゆる権利を侵害する意図はありません。
 
-.description {
-  font-size: 14px;
-  max-width: 900px;
-  margin: 0 auto;
-}
+次にカード検索の項目欄。全部チェックボックスで。
+項目①インクカラー
+アメジスト・アンバー・エメラルド・サファイア・スティール・ルビーの六つ。複数選択可能。検索結果はOR検索で。
+項目②コスト
+１～１２。複数選択可能で、OR検索。
+項目③レアリティ
+コモン・アンコモン・レア・スーパーレア・レジェンダリー・エピック・エンチャンテッド・アイコニック・その他　で。複数選択可能、OR検索。
+項目④収録弾
+1弾～15弾まで。複数選択可能、OR検索。
 
-/* ===== 検索エリア ===== */
-.search-area {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 10px;
-}
+そして、それぞれの項目同士はAND検索で。（例えばインクカラーをアンバーとエメラルドにして、収録弾を8弾と選んだら、収録弾8弾のアンバーかエメラルドに該当するカードが表示される、などのように。）
 
-.filter-group {
-  margin-bottom: 12px;
-}
+Githubのレポジトリー内に、README.md、index.html、そして表示するカード画像ファイルの三つがある。このindex.htmlの中でコードを書くんだけど、カード画像がちゃんとサイト上に表示されなかった失敗談が過去にあるのね。このレポジトリー内のカードデータを正しく参照できてなかったみたい。間違ったコードを書いたことが原因。その部分をちゃんと正しくカード画像がでるようにしてね。
 
-.filter-group strong {
-  display: block;
-  margin-bottom: 4px;
-}
+次の要件は、サイトに表示されるカードの挙動について。
+カードをクリック（タップ）すると、ポップアップのように画像が拡大表示され、カード画像の下にテキストも表示したい。
+また、カード画像の枠の左外に<、右外に>のような記号を出して、左をクリック（タップ）すると左隣のカードが、右をクリック（タップ）すると右隣のカードが表示されるようにしたい。（同じ拡大表示・テキスト表示のかたちは保ったまま）
+ここでいう左隣・右隣のカードは、ユーザーが操作したカード検索結果に準ずるカードであること。
 
-.filter-group label {
-  margin-right: 10px;
-  white-space: nowrap;
-}
+カードの枠の外の右上に×を出して、そこを押すと拡大表示をやめるという挙動にしてほしい。
 
-/* ===== カード一覧 ===== */
-.card-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 16px;
-  padding: 20px;
-  max-width: 1100px;
-  margin: 0 auto;
-}
+サイト全体をレスポンシブデザインにしてほしい。
+特に、カードの拡大表示。ユーザーのデバイスによってカードが見切れた経験があるから、どのスマホやタブレットやPCから見ても、しっかりカード画像が見切れずに表示され、枠外の×、<、>、テキストまで全部きちんと表示されるようにしてほしい。
 
-.card img {
-  width: 100%;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
+ウェブサイト全体の色合いは、背景をベージュとし、その他の色合いはネイビーや濃い青を基調とした色を使ってほしい。
 
-/* ===== モーダル ===== */
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
+いずれは独自ドメインも取得し、サーバーにアップして、アフィリンクを貼るなどして収益性ももたせる前提だよ。そのために、GitHub Pages前提で設計する必要があるのなら、そうしてくれ。
 
-.modal-content {
-  position: relative;
-  background: #f5f1e8;
-  padding: 12px;
-  border-radius: 10px;
-  max-width: 90vw;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+じゃあコードを書いてほしい。
+最初の1枚の画像ファイル名は、
+lady_familydog
+だよ。
+インクカラー：アンバー
+コスト：３
+レアリティ：レア
+収録弾：8弾
+テキスト：このキャラクターをプレイした時、コスト2以下のキャラクター1体をコストを支払わずにプレイしてよい。 
+今後、カードは数百種類に増えていく予定だから、あとから俺がカードを追加する時にコードを追記していく必要があるよね。コードを全部書いた後に、2枚目以降を追加していくときの操作も教えてね。なるべく、初心者にもわかりやすい設計でお願い。前に、コードのどの部分をどう修正すればいいかわからないという経験をしたことがあるので。
 
-.modal img {
-  max-width: 80vw;
-  max-height: 60vh;
-  object-fit: contain;
-}
-
-.modal-text {
-  margin-top: 10px;
-  font-size: 14px;
-  text-align: center;
-}
-
-.close-btn {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #1b2a4a;
-  color: #fff;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 36px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.nav.left { left: -35px; }
-.nav.right { right: -35px; }
-</style>
-</head>
-
-<body>
-
-<header>
-  <h1>Quest For</h1>
-  <p class="description">
-    本サイトはディズニーロルカナの非公式ファンサイトです。
-    本サイトに関する全ての権利は各権利者に帰属します。
-    本サイトは各権利者のあらゆる権利を侵害する意図はありません。
-  </p>
-</header>
-
-<!-- ===== 検索 ===== -->
-<div class="search-area">
-
-  <div class="filter-group">
-    <strong>インクカラー</strong>
-    <label><input type="checkbox" name="ink" value="アンバー">アンバー</label>
-    <label><input type="checkbox" name="ink" value="アメジスト">アメジスト</label>
-    <label><input type="checkbox" name="ink" value="エメラルド">エメラルド</label>
-    <label><input type="checkbox" name="ink" value="サファイア">サファイア</label>
-    <label><input type="checkbox" name="ink" value="スティール">スティール</label>
-    <label><input type="checkbox" name="ink" value="ルビー">ルビー</label>
-  </div>
-
-  <div class="filter-group">
-    <strong>コスト</strong>
-    <label><input type="checkbox" name="cost" value="3">3</label>
-  </div>
-
-  <div class="filter-group">
-    <strong>収録弾</strong>
-    <label><input type="checkbox" name="set" value="8">8弾</label>
-  </div>
-
-</div>
-
-<!-- ===== カード一覧 ===== -->
-<div class="card-list" id="cardList"></div>
-
-<!-- ===== モーダル ===== -->
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <span class="nav left" id="navLeft">＜</span>
-    <span class="nav right" id="navRight">＞</span>
-    <button class="close-btn" id="closeBtn">×</button>
-    <img id="modalImg">
-    <div class="modal-text" id="modalText"></div>
-  </div>
-</div>
-
-<script>
-/* ===============================
-   カードデータ（ここだけ触る）
-   =============================== */
-const cards = [
-  {
-    image: "./lady_familydog.webp",
-    ink: "アンバー",
-    cost: 3,
-    set: "8",
-    text: "このキャラクターをプレイした時、コスト2以下のキャラクター1体をコストを支払わずにプレイしてよい。"
-  }
-];
-
-/* ===== DOM ===== */
-const cardList = document.getElementById("cardList");
-const modal = document.getElementById("modal");
-const modalImg = document.getElementById("modalImg");
-const modalText = document.getElementById("modalText");
-const navLeft = document.getElementById("navLeft");
-const navRight = document.getElementById("navRight");
-const closeBtn = document.getElementById("closeBtn");
-
-let filtered = [...cards];
-let current = 0;
-
-/* ===== フィルタ ===== */
-function getChecked(name) {
-  return [...document.querySelectorAll(`input[name="${name}"]:checked`)]
-    .map(e => e.value);
-}
-
-function filterCards() {
-  const ink = getChecked("ink");
-  const cost = getChecked("cost");
-  const set = getChecked("set");
-
-  filtered = cards.filter(c =>
-    (ink.length === 0 || ink.includes(c.ink)) &&
-    (cost.length === 0 || cost.includes(String(c.cost))) &&
-    (set.length === 0 || set.includes(c.set))
-  );
-
-  render();
-}
-
-/* ===== 描画 ===== */
-function render() {
-  cardList.innerHTML = "";
-  filtered.forEach((c, i) => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `<img src="${c.image}" alt="">`;
-    div.addEventListener("click", () => openModal(i));
-    cardList.appendChild(div);
-  });
-}
-
-/* ===== モーダル ===== */
-function openModal(i) {
-  current = i;
-  modal.style.display = "flex";
-  modalImg.src = filtered[i].image;
-  modalText.textContent = filtered[i].text;
-}
-
-function closeModal() {
-  modal.style.display = "none";
-}
-
-function move(step) {
-  current = (current + step + filtered.length) % filtered.length;
-  openModal(current);
-}
-
-/* ===== イベント ===== */
-document.querySelectorAll("input[type=checkbox]")
-  .forEach(e => e.addEventListener("change", filterCards));
-
-navLeft.addEventListener("click", () => move(-1));
-navRight.addEventListener("click", () => move(1));
-closeBtn.addEventListener("click", closeModal);
-
-/* 初期表示 */
-render();
-</script>
-
-</body>
-</html>
+じゃあ、コード書いて。
