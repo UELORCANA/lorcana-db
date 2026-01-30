@@ -1,47 +1,296 @@
-GitHubでコードを書いて、TCGのデータベースサイト（検索機能付き）を作る。コードを書いてほしい。
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quest For</title>
+  <style>
+    /* ===== 基本配色 ===== */
+    :root {
+      --bg: #f5f0e6; /* ベージュ */
+      --main: #1f3556; /* ネイビー */
+      --accent: #2f4f7f; /* 濃い青 */
+      --white: #ffffff;
+    }
 
-要件を言うね。
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--main);
+    }
 
-サイト名：Quest For
-サイト名のすぐ下に説明文：本サイトはディズニーロルカナの非公式ファンサイトです。本サイトに関する全ての権利は各権利者に帰属します。本サイトは各権利者のあらゆる権利を侵害する意図はありません。
+    header {
+      padding: 16px;
+      text-align: center;
+    }
 
-次にカード検索の項目欄。全部チェックボックスで。
-項目①インクカラー
-アメジスト・アンバー・エメラルド・サファイア・スティール・ルビーの六つ。複数選択可能。検索結果はOR検索で。
-項目②コスト
-１～１２。複数選択可能で、OR検索。
-項目③レアリティ
-コモン・アンコモン・レア・スーパーレア・レジェンダリー・エピック・エンチャンテッド・アイコニック・その他　で。複数選択可能、OR検索。
-項目④収録弾
-1弾～15弾まで。複数選択可能、OR検索。
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
 
-そして、それぞれの項目同士はAND検索で。（例えばインクカラーをアンバーとエメラルドにして、収録弾を8弾と選んだら、収録弾8弾のアンバーかエメラルドに該当するカードが表示される、などのように。）
+    .description {
+      font-size: 0.85rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
 
-Githubのレポジトリー内に、README.md、index.html、そして表示するカード画像ファイルの三つがある。このindex.htmlの中でコードを書くんだけど、カード画像がちゃんとサイト上に表示されなかった失敗談が過去にあるのね。このレポジトリー内のカードデータを正しく参照できてなかったみたい。間違ったコードを書いたことが原因。その部分をちゃんと正しくカード画像がでるようにしてね。
+    /* ===== 検索エリア ===== */
+    .filters {
+      max-width: 1000px;
+      margin: 16px auto;
+      padding: 16px;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
 
-次の要件は、サイトに表示されるカードの挙動について。
-カードをクリック（タップ）すると、ポップアップのように画像が拡大表示され、カード画像の下にテキストも表示したい。
-また、カード画像の枠の左外に<、右外に>のような記号を出して、左をクリック（タップ）すると左隣のカードが、右をクリック（タップ）すると右隣のカードが表示されるようにしたい。（同じ拡大表示・テキスト表示のかたちは保ったまま）
-ここでいう左隣・右隣のカードは、ユーザーが操作したカード検索結果に準ずるカードであること。
+    .filter-group {
+      margin-bottom: 12px;
+    }
 
-カードの枠の外の右上に×を出して、そこを押すと拡大表示をやめるという挙動にしてほしい。
+    .filter-group strong {
+      display: block;
+      margin-bottom: 4px;
+    }
 
-サイト全体をレスポンシブデザインにしてほしい。
-特に、カードの拡大表示。ユーザーのデバイスによってカードが見切れた経験があるから、どのスマホやタブレットやPCから見ても、しっかりカード画像が見切れずに表示され、枠外の×、<、>、テキストまで全部きちんと表示されるようにしてほしい。
+    .filter-group label {
+      margin-right: 12px;
+      font-size: 0.9rem;
+    }
 
-ウェブサイト全体の色合いは、背景をベージュとし、その他の色合いはネイビーや濃い青を基調とした色を使ってほしい。
+    /* ===== カード一覧 ===== */
+    .card-grid {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
+    }
 
-いずれは独自ドメインも取得し、サーバーにアップして、アフィリンクを貼るなどして収益性ももたせる前提だよ。そのために、GitHub Pages前提で設計する必要があるのなら、そうしてくれ。
+    .card {
+      cursor: pointer;
+    }
 
-じゃあコードを書いてほしい。
-最初の1枚の画像ファイル名は、
-lady_familydog
-だよ。
-インクカラー：アンバー
-コスト：３
-レアリティ：レア
-収録弾：8弾
-テキスト：このキャラクターをプレイした時、コスト2以下のキャラクター1体をコストを支払わずにプレイしてよい。 
-今後、カードは数百種類に増えていく予定だから、あとから俺がカードを追加する時にコードを追記していく必要があるよね。コードを全部書いた後に、2枚目以降を追加していくときの操作も教えてね。なるべく、初心者にもわかりやすい設計でお願い。前に、コードのどの部分をどう修正すればいいかわからないという経験をしたことがあるので。
+    .card img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
 
-じゃあ、コード書いて。
+    /* ===== モーダル（拡大表示） ===== */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      position: relative;
+      background: var(--white);
+      max-width: 90vw;
+      max-height: 90vh;
+      padding: 16px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .modal img {
+      max-width: 100%;
+      max-height: 65vh;
+      object-fit: contain;
+    }
+
+    .modal-text {
+      margin-top: 12px;
+      font-size: 0.9rem;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+      color: var(--main);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .nav-left { left: -32px; }
+    .nav-right { right: -32px; }
+
+    @media (max-width: 600px) {
+      .nav-left { left: -16px; }
+      .nav-right { right: -16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Quest For</h1>
+  <div class="description">
+    本サイトはディズニーロルカナの非公式ファンサイトです。本サイトに関する全ての権利は各権利者に帰属します。本サイトは各権利者のあらゆる権利を侵害する意図はありません。
+  </div>
+</header>
+
+<section class="filters">
+  <div class="filter-group" id="filter-ink">
+    <strong>インクカラー</strong>
+    <label><input type="checkbox" value="アンバー">アンバー</label>
+    <label><input type="checkbox" value="アメジスト">アメジスト</label>
+    <label><input type="checkbox" value="エメラルド">エメラルド</label>
+    <label><input type="checkbox" value="サファイア">サファイア</label>
+    <label><input type="checkbox" value="スティール">スティール</label>
+    <label><input type="checkbox" value="ルビー">ルビー</label>
+  </div>
+
+  <div class="filter-group" id="filter-cost">
+    <strong>コスト</strong>
+    <!-- 1〜12 -->
+    <script>
+      for(let i=1;i<=12;i++){
+        document.write(`<label><input type=\"checkbox\" value=\"${i}\">${i}</label>`)
+      }
+    </script>
+  </div>
+
+  <div class="filter-group" id="filter-rarity">
+    <strong>レアリティ</strong>
+    <label><input type="checkbox" value="コモン">コモン</label>
+    <label><input type="checkbox" value="アンコモン">アンコモン</label>
+    <label><input type="checkbox" value="レア">レア</label>
+    <label><input type="checkbox" value="スーパーレア">スーパーレア</label>
+    <label><input type="checkbox" value="レジェンダリー">レジェンダリー</label>
+    <label><input type="checkbox" value="エピック">エピック</label>
+    <label><input type="checkbox" value="エンチャンテッド">エンチャンテッド</label>
+    <label><input type="checkbox" value="アイコニック">アイコニック</label>
+    <label><input type="checkbox" value="その他">その他</label>
+  </div>
+
+  <div class="filter-group" id="filter-set">
+    <strong>収録弾</strong>
+    <script>
+      for(let i=1;i<=15;i++){
+        document.write(`<label><input type=\"checkbox\" value=\"${i}弾\">${i}弾</label>`)
+      }
+    </script>
+  </div>
+</section>
+
+<section class="card-grid" id="cardGrid"></section>
+
+<!-- ===== モーダル ===== -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeBtn">×</span>
+    <span class="nav-btn nav-left" id="prevBtn">＜</span>
+    <span class="nav-btn nav-right" id="nextBtn">＞</span>
+    <img id="modalImg" src="" alt="" />
+    <div class="modal-text" id="modalText"></div>
+  </div>
+</div>
+
+<script>
+  /* ===== カードデータ ===== */
+  const cards = [
+    {
+      id: 1,
+      name: "LADY DOG Family Dog",
+      image: "lady_familydog.webp", // ← 画像ファイル名（webp / index.htmlと同じ階層）
+      ink: "アンバー",
+      cost: 3,
+      rarity: "レア",
+      set: "8弾",
+      text: "このキャラクターをプレイした時、コスト2以下のキャラクター1体をコストを支払わずにプレイしてよい。"
+    }
+  ];
+
+  let filteredCards = [...cards];
+  let currentIndex = 0;
+
+  const grid = document.getElementById('cardGrid');
+  const modal = document.getElementById('modal');
+  const modalImg = document.getElementById('modalImg');
+  const modalText = document.getElementById('modalText');
+
+  function renderCards() {
+    grid.innerHTML = '';
+    filteredCards.forEach((card, index) => {
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `<img src="${card.image}" alt="${card.name}">`;
+      div.onclick = () => openModal(index);
+      grid.appendChild(div);
+    });
+  }
+
+  function getCheckedValues(id) {
+    return [...document.querySelectorAll(`#${id} input:checked`)].map(i => i.value);
+  }
+
+  function applyFilters() {
+    const inks = getCheckedValues('filter-ink');
+    const costs = getCheckedValues('filter-cost');
+    const rarities = getCheckedValues('filter-rarity');
+    const sets = getCheckedValues('filter-set');
+
+    filteredCards = cards.filter(card => {
+      return (
+        (inks.length === 0 || inks.includes(card.ink)) &&
+        (costs.length === 0 || costs.includes(String(card.cost))) &&
+        (rarities.length === 0 || rarities.includes(card.rarity)) &&
+        (sets.length === 0 || sets.includes(card.set))
+      );
+    });
+    renderCards();
+  }
+
+  document.querySelectorAll('.filters input').forEach(cb => {
+    cb.addEventListener('change', applyFilters);
+  });
+
+  function openModal(index) {
+    currentIndex = index;
+    updateModal();
+    modal.style.display = 'flex';
+  }
+
+  function updateModal() {
+    const card = filteredCards[currentIndex];
+    modalImg.src = card.image;
+    modalText.textContent = card.text;
+  }
+
+  document.getElementById('closeBtn').onclick = () => modal.style.display = 'none';
+  document.getElementById('prevBtn').onclick = () => {
+    currentIndex = (currentIndex - 1 + filteredCards.length) % filteredCards.length;
+    updateModal();
+  };
+  document.getElementById('nextBtn').onclick = () => {
+    currentIndex = (currentIndex + 1) % filteredCards.length;
+    updateModal();
+  };
+
+  renderCards();
+</script>
+
+</body>
+</html>
