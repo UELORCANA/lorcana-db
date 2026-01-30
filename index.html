@@ -9,7 +9,7 @@
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
-  background: #f5f1e8;
+  background-color: #f5f1e8;
   color: #1b2a4a;
 }
 
@@ -21,12 +21,13 @@ header {
 .description {
   font-size: 14px;
   max-width: 900px;
-  margin: auto;
+  margin: 0 auto;
 }
 
+/* ===== 検索エリア ===== */
 .search-area {
   max-width: 1100px;
-  margin: auto;
+  margin: 0 auto;
   padding: 10px;
 }
 
@@ -41,22 +42,24 @@ header {
 
 .filter-group label {
   margin-right: 10px;
+  white-space: nowrap;
 }
 
+/* ===== カード一覧 ===== */
 .card-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 16px;
   padding: 20px;
   max-width: 1100px;
-  margin: auto;
+  margin: 0 auto;
 }
 
 .card img {
   width: 100%;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,.15);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 /* ===== モーダル ===== */
@@ -64,16 +67,17 @@ header {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.6);
+  background: rgba(0,0,0,0.6);
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  background: #f5f1e8;
-  padding: 10px;
-  border-radius: 10px;
   position: relative;
+  background: #f5f1e8;
+  padding: 12px;
+  border-radius: 10px;
   max-width: 90vw;
   max-height: 90vh;
   display: flex;
@@ -88,9 +92,9 @@ header {
 }
 
 .modal-text {
-  margin-top: 8px;
-  text-align: center;
+  margin-top: 10px;
   font-size: 14px;
+  text-align: center;
 }
 
 .close-btn {
@@ -124,52 +128,57 @@ header {
 <body>
 
 <header>
-<h1>Quest For</h1>
-<p class="description">
-本サイトはディズニーロルカナの非公式ファンサイトです。
-本サイトに関する全ての権利は各権利者に帰属します。
-本サイトは各権利者のあらゆる権利を侵害する意図はありません。
-</p>
+  <h1>Quest For</h1>
+  <p class="description">
+    本サイトはディズニーロルカナの非公式ファンサイトです。
+    本サイトに関する全ての権利は各権利者に帰属します。
+    本サイトは各権利者のあらゆる権利を侵害する意図はありません。
+  </p>
 </header>
 
+<!-- ===== 検索 ===== -->
 <div class="search-area">
 
-<div class="filter-group">
-<strong>インクカラー</strong>
-<label><input type="checkbox" name="ink" value="アンバー">アンバー</label>
-<label><input type="checkbox" name="ink" value="アメジスト">アメジスト</label>
-<label><input type="checkbox" name="ink" value="エメラルド">エメラルド</label>
-<label><input type="checkbox" name="ink" value="サファイア">サファイア</label>
-<label><input type="checkbox" name="ink" value="スティール">スティール</label>
-<label><input type="checkbox" name="ink" value="ルビー">ルビー</label>
+  <div class="filter-group">
+    <strong>インクカラー</strong>
+    <label><input type="checkbox" name="ink" value="アンバー">アンバー</label>
+    <label><input type="checkbox" name="ink" value="アメジスト">アメジスト</label>
+    <label><input type="checkbox" name="ink" value="エメラルド">エメラルド</label>
+    <label><input type="checkbox" name="ink" value="サファイア">サファイア</label>
+    <label><input type="checkbox" name="ink" value="スティール">スティール</label>
+    <label><input type="checkbox" name="ink" value="ルビー">ルビー</label>
+  </div>
+
+  <div class="filter-group">
+    <strong>コスト</strong>
+    <label><input type="checkbox" name="cost" value="3">3</label>
+  </div>
+
+  <div class="filter-group">
+    <strong>収録弾</strong>
+    <label><input type="checkbox" name="set" value="8">8弾</label>
+  </div>
+
 </div>
 
-<div class="filter-group">
-<strong>コスト</strong>
-<label><input type="checkbox" name="cost" value="3">3</label>
-</div>
-
-<div class="filter-group">
-<strong>収録弾</strong>
-<label><input type="checkbox" name="set" value="8">8弾</label>
-</div>
-
-</div>
-
+<!-- ===== カード一覧 ===== -->
 <div class="card-list" id="cardList"></div>
 
+<!-- ===== モーダル ===== -->
 <div class="modal" id="modal">
   <div class="modal-content">
-    <span class="nav left" onclick="move(-1)">＜</span>
-    <span class="nav right" onclick="move(1)">＞</span>
-    <button class="close-btn" onclick="closeModal()">×</button>
+    <span class="nav left" id="navLeft">＜</span>
+    <span class="nav right" id="navRight">＞</span>
+    <button class="close-btn" id="closeBtn">×</button>
     <img id="modalImg">
     <div class="modal-text" id="modalText"></div>
   </div>
 </div>
 
 <script>
-/* ===== カードデータ ===== */
+/* ===============================
+   カードデータ（ここだけ触る）
+   =============================== */
 const cards = [
   {
     image: "./lady_familydog.webp",
@@ -180,9 +189,19 @@ const cards = [
   }
 ];
 
-let filtered = cards;
+/* ===== DOM ===== */
+const cardList = document.getElementById("cardList");
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modalImg");
+const modalText = document.getElementById("modalText");
+const navLeft = document.getElementById("navLeft");
+const navRight = document.getElementById("navRight");
+const closeBtn = document.getElementById("closeBtn");
+
+let filtered = [...cards];
 let current = 0;
 
+/* ===== フィルタ ===== */
 function getChecked(name) {
   return [...document.querySelectorAll(`input[name="${name}"]:checked`)]
     .map(e => e.value);
@@ -202,18 +221,19 @@ function filterCards() {
   render();
 }
 
+/* ===== 描画 ===== */
 function render() {
-  const list = document.getElementById("cardList");
-  list.innerHTML = "";
-  filtered.forEach((c,i) => {
-    const d = document.createElement("div");
-    d.className = "card";
-    d.innerHTML = `<img src="${c.image}">`;
-    d.onclick = () => openModal(i);
-    list.appendChild(d);
+  cardList.innerHTML = "";
+  filtered.forEach((c, i) => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `<img src="${c.image}" alt="">`;
+    div.addEventListener("click", () => openModal(i));
+    cardList.appendChild(div);
   });
 }
 
+/* ===== モーダル ===== */
 function openModal(i) {
   current = i;
   modal.style.display = "flex";
@@ -230,9 +250,15 @@ function move(step) {
   openModal(current);
 }
 
+/* ===== イベント ===== */
 document.querySelectorAll("input[type=checkbox]")
   .forEach(e => e.addEventListener("change", filterCards));
 
+navLeft.addEventListener("click", () => move(-1));
+navRight.addEventListener("click", () => move(1));
+closeBtn.addEventListener("click", closeModal);
+
+/* 初期表示 */
 render();
 </script>
 
