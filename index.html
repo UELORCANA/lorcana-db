@@ -152,16 +152,6 @@
 </header>
 
 <section class="filters">
-  <div class="filter-group" id="filter-keyword">
-  <strong>フリーワード</strong>
-  <input
-    type="text"
-    id="keywordInput"
-    placeholder="テキスト"
-    style="width:100%; max-width:320px;"
-  >
-</div>
-  
   <div class="filter-group" id="filter-ink">
     <strong>インクカラー</strong>
     <label><input type="checkbox" value="アンバー">アンバー</label>
@@ -221,17 +211,6 @@
 <script>
   /* ===== カードデータ ===== */
   const cards = [
-     {
-    id: 1,
-    name: "LOUIE One Cool Dog",
-    image: "images/set08/008-001",
-    ink: "アンバー",
-    cost: 3,
-    rarity: "アンコモン",
-    set: "8弾",
-    text: "ストーリーボーン・仲間　このキャラクターがチャレンジされている間、チャレンジしたキャラクターの攻撃力は-3される。"
-  }
-
   ];
 
   let filteredCards = [...cards];
@@ -305,8 +284,5 @@
 
 </body>
 </html>
-
-
-
 
 
