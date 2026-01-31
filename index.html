@@ -1,158 +1,155 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quest For</title>
-  <style>
-    /* ===== 基本配色 ===== */
-    :root {
-      --bg: #f5f0e6; /* ベージュ */
-      --main: #1f3556; /* ネイビー */
-      --accent: #2f4f7f; /* 濃い青 */
-      --white: #ffffff;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quest For</title>
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--main);
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: #f3efe6; /* ベージュ */
+    color: #1b2a4e; /* ネイビー */
+  }
 
-    header {
-      padding: 16px;
-      text-align: center;
-    }
+  header {
+    padding: 16px;
+    text-align: center;
+  }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 2rem;
-    }
+  h1 {
+    margin-bottom: 8px;
+  }
 
-    .description {
-      font-size: 0.85rem;
-      max-width: 900px;
-      margin: 0 auto;
-    }
+  .description {
+    font-size: 0.85rem;
+    color: #333;
+    max-width: 800px;
+    margin: 0 auto;
+  }
 
-    /* ===== 検索エリア ===== */
-    .filters {
-      max-width: 1000px;
-      margin: 16px auto;
-      padding: 16px;
-      background: var(--white);
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    }
+  .filters {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
 
-    .filter-group {
-      margin-bottom: 12px;
-    }
+  .filter-group {
+    background: #fff;
+    padding: 12px;
+    border-radius: 8px;
+  }
 
-    .filter-group strong {
-      display: block;
-      margin-bottom: 4px;
-    }
+  .filter-group strong {
+    display: block;
+    margin-bottom: 6px;
+  }
 
-    .filter-group label {
-      margin-right: 12px;
-      font-size: 0.9rem;
-    }
+  .cards {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
 
-    /* ===== カード一覧 ===== */
-    .card-grid {
-      max-width: 1200px;
-      margin: 24px auto;
-      padding: 0 16px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 16px;
-    }
+  .card img {
+    width: 100%;
+    cursor: pointer;
+    border-radius: 6px;
+  }
 
-    .card {
-      cursor: pointer;
-    }
+  /* ===== モーダル ===== */
 
-    .card img {
-      width: 100%;
-      height: auto;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
 
-    /* ===== モーダル（拡大表示） ===== */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
+  .modal-content {
+    background: #fff;
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 12px;
+    border-radius: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .modal-content {
-      position: relative;
-      background: var(--white);
-      max-width: 90vw;
-      max-height: 90vh;
-      padding: 16px;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+  .modal img {
+    max-width: 90vw;
+    max-height: 60vh;
+    object-fit: contain;
+  }
 
-    .modal img {
-      max-width: 100%;
-      max-height: 65vh;
-      object-fit: contain;
-    }
+  .modal-text {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    text-align: left;
+    max-width: 600px;
+  }
 
-    .modal-text {
-      margin-top: 12px;
-      font-size: 0.9rem;
-    }
+  .close,
+  .nav {
+    position: absolute;
+    font-size: 2rem;
+    cursor: pointer;
+    user-select: none;
+    color: #1b2a4e;
+  }
 
-    .close-btn {
-      position: absolute;
-      top: 8px;
-      right: 12px;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
+  .close {
+    top: 8px;
+    right: 12px;
+  }
 
-    .nav-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 2rem;
-      color: var(--main);
-      cursor: pointer;
-      user-select: none;
-    }
+  .nav.left {
+    left: -24px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 
-    .nav-left { left: -32px; }
-    .nav-right { right: -32px; }
+  .nav.right {
+    right: -24px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 
-    @media (max-width: 600px) {
-      .nav-left { left: -16px; }
-      .nav-right { right: -16px; }
-    }
-  </style>
+  @media (max-width: 600px) {
+    .nav.left { left: 4px; }
+    .nav.right { right: 4px; }
+  }
+</style>
 </head>
+
 <body>
 
 <header>
   <h1>Quest For</h1>
   <div class="description">
-    本サイトはディズニーロルカナの非公式ファンサイトです。本サイトに関する全ての権利は各権利者に帰属します。本サイトは各権利者のあらゆる権利を侵害する意図はありません。
+    本サイトはディズニーロルカナの非公式ファンサイトです。<br>
+    本サイトに関する全ての権利は各権利者に帰属します。<br>
+    本サイトは各権利者のあらゆる権利を侵害する意図はありません。
   </div>
 </header>
 
 <section class="filters">
-  <div class="filter-group" id="filter-ink">
+
+  <div class="filter-group">
+    <strong>フリーワード</strong>
+    <input id="keyword" type="text" placeholder="カード名・効果テキスト"
+      style="width:100%; max-width:300px;">
+  </div>
+
+  <div class="filter-group">
     <strong>インクカラー</strong>
     <label><input type="checkbox" value="アンバー">アンバー</label>
     <label><input type="checkbox" value="アメジスト">アメジスト</label>
@@ -162,126 +159,122 @@
     <label><input type="checkbox" value="ルビー">ルビー</label>
   </div>
 
-  <div class="filter-group" id="filter-cost">
+  <div class="filter-group">
     <strong>コスト</strong>
-    <!-- 1〜12 -->
-    <script>
-      for(let i=1;i<=12;i++){
-        document.write(`<label><input type=\"checkbox\" value=\"${i}\">${i}</label>`)
-      }
-    </script>
+    <label><input type="checkbox" value="3">3</label>
   </div>
 
-  <div class="filter-group" id="filter-rarity">
+  <div class="filter-group">
     <strong>レアリティ</strong>
-    <label><input type="checkbox" value="コモン">コモン</label>
-    <label><input type="checkbox" value="アンコモン">アンコモン</label>
     <label><input type="checkbox" value="レア">レア</label>
-    <label><input type="checkbox" value="スーパーレア">スーパーレア</label>
-    <label><input type="checkbox" value="レジェンダリー">レジェンダリー</label>
-    <label><input type="checkbox" value="エピック">エピック</label>
-    <label><input type="checkbox" value="エンチャンテッド">エンチャンテッド</label>
-    <label><input type="checkbox" value="アイコニック">アイコニック</label>
-    <label><input type="checkbox" value="その他">その他</label>
   </div>
 
-  <div class="filter-group" id="filter-set">
+  <div class="filter-group">
     <strong>収録弾</strong>
-    <script>
-      for(let i=1;i<=15;i++){
-        document.write(`<label><input type=\"checkbox\" value=\"${i}弾\">${i}弾</label>`)
-      }
-    </script>
+    <label><input type="checkbox" value="8弾">8弾</label>
   </div>
+
 </section>
 
-<section class="card-grid" id="cardGrid"></section>
+<section class="cards" id="cardList"></section>
 
-<!-- ===== モーダル ===== -->
+<!-- モーダル -->
 <div class="modal" id="modal">
   <div class="modal-content">
-    <span class="close-btn" id="closeBtn">×</span>
-    <span class="nav-btn nav-left" id="prevBtn">＜</span>
-    <span class="nav-btn nav-right" id="nextBtn">＞</span>
-    <img id="modalImg" src="" alt="" />
+    <span class="close" id="closeBtn">×</span>
+    <span class="nav left" id="prevBtn">&lt;</span>
+    <span class="nav right" id="nextBtn">&gt;</span>
+    <img id="modalImg">
     <div class="modal-text" id="modalText"></div>
   </div>
 </div>
 
 <script>
-  /* ===== カードデータ ===== */
-  const cards = [
-  ];
-
-  let filteredCards = [...cards];
-  let currentIndex = 0;
-
-  const grid = document.getElementById('cardGrid');
-  const modal = document.getElementById('modal');
-  const modalImg = document.getElementById('modalImg');
-  const modalText = document.getElementById('modalText');
-
-  function renderCards() {
-    grid.innerHTML = '';
-    filteredCards.forEach((card, index) => {
-      const div = document.createElement('div');
-      div.className = 'card';
-      div.innerHTML = `<img src="${card.image}" alt="${card.name}">`;
-      div.onclick = () => openModal(index);
-      grid.appendChild(div);
-    });
+/* ===== カードデータ ===== */
+const cards = [
+  {
+    id: 1,
+    name: "LOUIE One Cool Dog",
+    image: "images/set08/008-001.webp",
+    ink: "アンバー",
+    cost: 3,
+    rarity: "アンコモン",
+    set: "8弾",
+    class: "ストーリーボーン、仲間",
+    text: "このキャラクターはチャレンジされている間、チャレンジしたキャラクターの攻撃力は-1される。"
   }
+];
 
-  function getCheckedValues(id) {
-    return [...document.querySelectorAll(`#${id} input:checked`)].map(i => i.value);
-  }
+let filteredCards = [...cards];
+let currentIndex = 0;
 
-  function applyFilters() {
-    const inks = getCheckedValues('filter-ink');
-    const costs = getCheckedValues('filter-cost');
-    const rarities = getCheckedValues('filter-rarity');
-    const sets = getCheckedValues('filter-set');
+/* ===== 描画 ===== */
+function renderCards() {
+  const list = document.getElementById("cardList");
+  list.innerHTML = "";
+  filteredCards.forEach((card, index) => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `<img src="${card.image}" alt="${card.name}">`;
+    div.onclick = () => openModal(index);
+    list.appendChild(div);
+  });
+}
 
-    filteredCards = cards.filter(card => {
-      return (
-        (inks.length === 0 || inks.includes(card.ink)) &&
-        (costs.length === 0 || costs.includes(String(card.cost))) &&
-        (rarities.length === 0 || rarities.includes(card.rarity)) &&
-        (sets.length === 0 || sets.includes(card.set))
-      );
-    });
-    renderCards();
-  }
+/* ===== モーダル ===== */
+function openModal(index) {
+  currentIndex = index;
+  const card = filteredCards[index];
+  document.getElementById("modalImg").src = card.image;
+  document.getElementById("modalText").innerHTML = `
+    <div><strong>${card.class}</strong></div>
+    <div style="margin-top:6px;">${card.text}</div>
+  `;
+  document.getElementById("modal").style.display = "flex";
+}
 
-  document.querySelectorAll('.filters input').forEach(cb => {
-    cb.addEventListener('change', applyFilters);
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+}
+
+function showNext(dir) {
+  currentIndex = (currentIndex + dir + filteredCards.length) % filteredCards.length;
+  openModal(currentIndex);
+}
+
+/* ===== フィルタ ===== */
+function applyFilters() {
+  const inks = [...document.querySelectorAll('input[type=checkbox]:checked')]
+    .map(c => c.value);
+
+  const keyword = document.getElementById("keyword").value.trim();
+
+  filteredCards = cards.filter(card => {
+    return (
+      (inks.length === 0 || inks.includes(card.ink)) &&
+      (keyword === "" ||
+        card.name.includes(keyword) ||
+        card.text.includes(keyword) ||
+        card.class.includes(keyword))
+    );
   });
 
-  function openModal(index) {
-    currentIndex = index;
-    updateModal();
-    modal.style.display = 'flex';
-  }
-
-  function updateModal() {
-    const card = filteredCards[currentIndex];
-    modalImg.src = card.image;
-    modalText.textContent = card.text;
-  }
-
-  document.getElementById('closeBtn').onclick = () => modal.style.display = 'none';
-  document.getElementById('prevBtn').onclick = () => {
-    currentIndex = (currentIndex - 1 + filteredCards.length) % filteredCards.length;
-    updateModal();
-  };
-  document.getElementById('nextBtn').onclick = () => {
-    currentIndex = (currentIndex + 1) % filteredCards.length;
-    updateModal();
-  };
-
   renderCards();
+}
+
+/* ===== イベント ===== */
+document.querySelectorAll("input").forEach(el => {
+  el.addEventListener("change", applyFilters);
+  el.addEventListener("input", applyFilters);
+});
+
+document.getElementById("closeBtn").onclick = closeModal;
+document.getElementById("prevBtn").onclick = () => showNext(-1);
+document.getElementById("nextBtn").onclick = () => showNext(1);
+
+/* 初期描画 */
+renderCards();
 </script>
 
 </body>
 </html>
-
